@@ -1,0 +1,142 @@
+### Turn on solid yellow
+PUT http://localhost:3000/mockResponse
+Content-Type: application/json
+
+{
+
+        "members": [
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_active",
+                "state": "on",
+                "type": "Switch",
+                "name": "arias_blink_active",
+                "label": "Aria's Blink Active",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            },
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_color",
+                "state": "yellow",
+                "type": "String",
+                "name": "arias_blink_color",
+                "label": "Aria's Blink Color",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            },
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_flash",
+                "state": "off",
+                "type": "Switch",
+                "name": "arias_blink_flash",
+                "label": "Aria's Blink Flash",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            }
+        ]
+    }
+
+###
+# Turn on flashing yellow 
+PUT http://localhost:3000/mockResponse
+Content-Type: application/json
+
+{
+
+        "members": [
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_active",
+                "state": "on",
+                "type": "Switch",
+                "name": "arias_blink_active",
+                "label": "Aria's Blink Active",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            },
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_color",
+                "state": "red",
+                "type": "String",
+                "name": "arias_blink_color",
+                "label": "Aria's Blink Color",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            },
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_flash",
+                "state": "on",
+                "type": "Switch",
+                "name": "arias_blink_flash",
+                "label": "Aria's Blink Flash",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            }
+        ]
+    }
+###
+# Turn off, but leave flashing on / should be ignored
+PUT http://localhost:3000/mockResponse
+Content-Type: application/json
+
+{
+
+        "members": [
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_active",
+                "state": "off",
+                "type": "Switch",
+                "name": "arias_blink_active",
+                "label": "Aria's Blink Active",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            },
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_color",
+                "state": "yellow",
+                "type": "String",
+                "name": "arias_blink_color",
+                "label": "Aria's Blink Color",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            },
+            {
+                "link": "http://10.0.0.4:8080/rest/items/arias_blink_flash",
+                "state": "on",
+                "type": "Switch",
+                "name": "arias_blink_flash",
+                "label": "Aria's Blink Flash",
+                "category": "Aria's Blink",
+                "tags": [],
+                "groupNames": [
+                    "AriasBlinkJson"
+                ]
+            }
+        ]
+    }
+
+###
+# doGet
+GET http://localhost:3000/mockResponse 

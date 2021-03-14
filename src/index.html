@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Scream Duck</title>
+</head>
+
+<body>
+    <script>
+        // Reference to the WebSocket connection to the Stream Deck
+        let conn = null;
+        const ariaBlinkUrl = "http://localhost:3000/mockresponse"; // http://10.0.0.4:8080/rest/items/AriasBlinkJson
+
+        // State machine here.
+        // REST API alters this singleton
+        let blinkConfig = {
+            intervalRef: null, // Reference to the interval timer
+            intervalMillis: 5000,  // Pull from openhab every X millis
+            offColor: "black",
+            onColor: null, // Set by openhab request
+            onEh: false, // Canadian way of saying "isOn"
+            blinkRef: null, // Reference to the setInterval(toggleColor)
+            blinkMillis: 1000, // How quick to blink
+        }
+
+        
+        /*
+         This function is called on startup of the plugin,  don't change this interface.
+        
+         function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info)
+         port: Stream Deck Websocket port number
+         uuid: Unique ID of the plugin instance (to support multiple instances on the display)
+         registerEvent: Meaningless payload that is sent to the Stream Deck to register the plugin with the Deck.
+         info: Pointless info about the plugin (e.g. version number)
+         */
+        function connectElgatoStreamDeckSocket(port, uuid, registerEvent, info) {
+            // Step 1: open a websocket to the Stream Deck
+            console.log("Connecting to Stream Deck...");
+            conn = new WebSocket("ws://127.0.0.1:" + port);
+
+            // Step 2: when the connection is open...
+            conn.onopen = () => {
+                console.log("... connected.");
+                // Register the plugin with the Stream Deck
+                conn.send(JSON.stringify({
+                    event: registerEvent,
+                    uuid: uuid
+                }));
+            };
+
+            // Step 3: When a message is received from the Stream Deck, via the websocket
+            // Then do stuff, based on the messageEvent.data.event indicator
+            conn.onmessage = (messageEvent) => {
+                var data = JSON.parse(messageEvent.data);
+                // console.log(data);
+                // set a context variable so that it can be easily referenced when sending messages back
+                conn._context = data.context;
+
+                // https://developer.elgato.com/documentation/stream-deck/sdk/events-received/
+                switch (data.event) {
+                    case "willAppear": // when the plugin appears on the Deck
+                        initHeartbeat();
+                        break;
+
+                    // other example events, follow same pattern here
+                    case "willDisappear": // when the plugin is removed from the Deck
+                    case "keyDown": // when the button is pushed down
+                    case "keyUp": // when the button is let go
+                    case "systemDidWakeUp": // when the is woken up
+
+                }
+            }
+
+            /* 
+             Draws a square on the button, of the given color 
+
+             @color https://drafts.csswg.org/css-color/#named-colors
+
+             This is done by sending JSON String via the websocket.
+             { 
+                event: action to perform,
+                context: plugin instance context saved in conn._context during onmessage.
+                payload: {
+                    image: svg
+                    target: 0 = Hardware (Physical Deck) & Software (Mobile app)
+                }
+            }
+            */
+            conn.setSquareImage = (color) => {
+                conn.send(JSON.stringify({
+                    event: "setImage",
+                    context: conn._context,
+                    payload: {
+                        image: `data:image/svg+xml;charset=utf8,<svg height=\"100\" width=\"100\">
+                                    <rect width="100%" height="100%" fill=\"${color}\" />
+                                </svg>`,
+                        target: 0
+                    }
+                }));
+            }
+        }
+
+
+        /*
+            Kicks off the "query to API" interval
+        */
+        function initHeartbeat() {
+            queryOpenHabAndUpdateImage();
+            blinkConfig.intervalRef = setInterval(() => queryOpenHabAndUpdateImage(), blinkConfig.intervalMillis);
+        }
+
+
+        /* Called by intervals
+        I externalized the setSquareImage, for reuse
+        */
+        function setAriaBlink() {
+            conn.setSquareImage(blinkConfig.onEh ? blinkConfig.onColor : blinkConfig.offColor);
+        }
+
+        /*
+        Queries the Rest API
+        Converts the array of OpenHAB group "members" to an Object (for convenience)
+        Updates the blinkConfig StateMachine
+
+        */
+        async function queryOpenHabAndUpdateImage() {
+            // Fetch member data from url
+            let response = await fetch(ariaBlinkUrl);
+            //let blinkData = await fetch(`${ariaBlinkUrl}?${+new Date()}`); // if the cache is not refreshing
+            let blinkData = await response.json();
+            // Convert an array of member entries into an object using reduce
+            blinkData = blinkData.members.reduce((obj, val) => {
+                obj[val.name] = val.state.toLowerCase();
+                return obj;
+            }, {});
+            // blinkData now becomes {  arias_blink_active: "OFF", arias_blink_color: "GREEN", arias_blink_flash: "ON"}
+            
+
+
+            blinkConfig.onColor = blinkData.arias_blink_color;
+
+            // TODO This stuff could be an update() function inside the statemachine class, but meh.
+            // turn on
+            if (blinkData.arias_blink_active === "on") {
+                //console.log('On:', blinkConfig);
+                // and blinking
+                if (blinkData.arias_blink_flash === "on") {
+                    blinkConfig.onColor = blinkData.arias_blink_color;
+                    
+                    // Start an interval if it's not already flashing
+                    blinkConfig.blinkRef = blinkConfig.blinkRef || setInterval(() => {
+                        blinkConfig.onEh = !blinkConfig.onEh;
+                        setAriaBlink();
+                    }, blinkConfig.blinkMillis);
+
+                } else {
+                    clearInterval(blinkConfig.blinkRef); // stop blinking
+                    blinkConfig.blinkRef = null;
+                    blinkConfig.onEh = true;
+                    setAriaBlink();
+                }
+            } else {
+                clearInterval(blinkConfig.blinkRef); // stop blinking
+                blinkConfig.blinkRef = null; 
+                blinkConfig.onEh = false; // turn off
+                setAriaBlink();
+            }
+
+        };
+
+
+
+    </script>
+</body>
+
+</html>

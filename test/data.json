@@ -1,0 +1,42 @@
+{
+  "mockresponse": {
+    "members": [
+      {
+        "link": "http://10.0.0.4:8080/rest/items/arias_blink_active",
+        "state": "on",
+        "type": "Switch",
+        "name": "arias_blink_active",
+        "label": "Aria's Blink Active",
+        "category": "Aria's Blink",
+        "tags": [],
+        "groupNames": [
+          "AriasBlinkJson"
+        ]
+      },
+      {
+        "link": "http://10.0.0.4:8080/rest/items/arias_blink_color",
+        "state": "red",
+        "type": "String",
+        "name": "arias_blink_color",
+        "label": "Aria's Blink Color",
+        "category": "Aria's Blink",
+        "tags": [],
+        "groupNames": [
+          "AriasBlinkJson"
+        ]
+      },
+      {
+        "link": "http://10.0.0.4:8080/rest/items/arias_blink_flash",
+        "state": "on",
+        "type": "Switch",
+        "name": "arias_blink_flash",
+        "label": "Aria's Blink Flash",
+        "category": "Aria's Blink",
+        "tags": [],
+        "groupNames": [
+          "AriasBlinkJson"
+        ]
+      }
+    ]
+  }
+}

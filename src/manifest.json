@@ -1,0 +1,31 @@
+{
+    "Actions": [
+        {
+            "Icon": "futileIcon",
+            "Name": "Scream",
+            "States": [
+                {
+                    "Image": "futileIcon"
+                }
+            ],
+            "UUID": "com.somejeff.screamduck.action"
+        }
+    ],
+    "SDKVersion": 2,
+    "Author": "Irrelevant Author Required",
+    "CodePath": "index.html",
+    "Description": "Useless Description Required",
+    "Name": "Scream Duck",
+    "Icon": "futileIcon",
+    "Version": "1.4",
+    "OS": [
+        {
+            "Platform": "windows",
+            "MinimumVersion": "10"
+        }
+    ],
+    "Software": {
+        "MinimumVersion": "4.1"
+    }
+    
+}
